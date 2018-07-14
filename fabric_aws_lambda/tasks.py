@@ -45,8 +45,12 @@ class SetupTask(BaseTask):
             lib_path=self.lib_path
         )
 
-        local("""pip install --upgrade \
-            -r {requirements} -t {lib_path}""".format(**options))
+        command = (
+            "pip install --upgrade",
+            "-r {requirements}",
+            "-t {lib_path}"
+        )
+        local(' '.join(command).format(**options))
 
 
 class InvokeTask(BaseTask):
@@ -72,12 +76,15 @@ class InvokeTask(BaseTask):
             self.options['event_file'] = event_file
 
         with shell_env(PYTHONPATH=self.options['lib_path']):
-            local("""
-            python-lambda-local \
-                -t {timeout} \
-                -l {lib_path} \
-                -f {lambda_handler} {lambda_file} {event_file}
-            """.format(**self.options))
+            command = (
+                "python-lambda-local",
+                "-t {timeout}"
+                "-l {lib_path}",
+                "-f {lambda_handler}",
+                "{lambda_file}",
+                "{event_file}"
+            )
+            local(' '.join(command).format(**self.options))
 
 
 class MakeZipTask(BaseTask):
@@ -131,11 +138,12 @@ class AWSLambdaGetConfigTask(BaseTask):
         if function_name is not None:
             self.options['function_name'] = function_name
 
-        result = local("""
-        aws lambda get-function-configuration \
-            --function-name {function_name} \
-            --qualifier {qualifier}
-        """.format(**self.options), capture=True)
+        command = (
+            "aws lambda get-function-configuration",
+            "--function-name {function_name}",
+            "--qualifier {qualifier}"
+        )
+        result = local(' '.join(command).format(**self.options), capture=True)
 
         print(result)
 
@@ -162,15 +170,16 @@ class AWSLambdaInvokeTask(BaseTask):
         if function_name is not None:
             self.options['function_name'] = function_name
 
-        result = local("""
-        aws lambda invoke \
-            --function-name {function_name} \
-            --invocation-type {invocation_type} \
-            --log-type {log_type} \
-            --payload {payload} \
-            --qualifier {qualifier} \
-            {outfile}
-        """.format(**self.options), capture=True)
+        command = (
+            "aws lambda invoke",
+            "--function-name {function_name}",
+            "--invocation-type {invocation_type}",
+            "--log-type {log_type}",
+            "--payload {payload}",
+            "--qualifier {qualifier}",
+            "{outfile}",
+        )
+        result = local(' '.join(command).format(**self.options), capture=True)
 
         self.print_log_result(result)
         self.print_result(self.options['outfile'])
@@ -200,10 +209,11 @@ class AWSLambdaUpdateCodeTask(BaseTask):
         if function_name is not None:
             self.options['function_name'] = function_name
 
-        result = local("""
-        aws lambda update-function-code \
-            --function-name {function_name} \
-            --zip-file {zip_file}
-        """.format(**self.options), capture=True)
+        command = (
+            "aws lambda update-function-code",
+            "--function-name {function_name}",
+            "--zip-file {zip_file}",
+        )
+        result = local(' '.join(command).format(**self.options), capture=True)
 
         print(result)
