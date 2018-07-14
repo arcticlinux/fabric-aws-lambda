@@ -1,11 +1,13 @@
-import os
 import base64
 import json
+import os
 import tempfile
-from fabric.api import local
+
 from fabric.api import lcd
+from fabric.api import local
 from fabric.api import shell_env
 from fabric.tasks import Task
+
 
 class BaseTask(Task):
     def run(self, *args, **kwargs):
@@ -32,6 +34,7 @@ class SetupTask(BaseTask):
         self.lib_path = lib_path
         self.install_prefix = install_prefix
         self.tempdir = tempfile.gettempdir()
+        super(SetupTask, self).__init__()
 
     def run_main(self):
         self.install_python_modules()
@@ -45,11 +48,13 @@ class SetupTask(BaseTask):
         local("""pip install --upgrade \
             -r {requirements} -t {lib_path}""".format(**options))
 
+
 class InvokeTask(BaseTask):
     """Invoke function on Local Machine."""
     name = 'invoke'
 
-    def __init__(self, lambda_handler='lambda_handler', lambda_file='lambda_function.py', event_file='event.json', lib_path='./lib', timeout=3):
+    def __init__(self, lambda_handler='lambda_handler', lambda_file='lambda_function.py', event_file='event.json',
+                 lib_path='./lib', timeout=3):
         self.options = dict(
             lambda_handler=lambda_handler,
             lambda_file=lambda_file,
@@ -57,6 +62,7 @@ class InvokeTask(BaseTask):
             lib_path=lib_path,
             timeout=timeout
         )
+        super(InvokeTask, self).__init__()
 
     def run_main(self, event_file=None):
         self.invoke(event_file)
@@ -82,6 +88,7 @@ class MakeZipTask(BaseTask):
         self.zip_file = zip_file
         self.exclude_file = exclude_file
         self.lib_path = lib_path
+        super(MakeZipTask, self).__init__()
 
     def run_main(self):
         self.remove_zip_file()
@@ -93,7 +100,7 @@ class MakeZipTask(BaseTask):
 
     def makezip(self):
         options = dict(zip_file=self.zip_file, exclude_file=self.exclude_file)
-        local('zip -r9 {zip_file} * -x@{exclude_file}'.format(**options))
+        local('zip -r9 {zip_file} * -x{exclude_file}'.format(**options))
 
     def makezip_basepath(self):
         self.makezip()
@@ -105,16 +112,17 @@ class MakeZipTask(BaseTask):
         with lcd(self.lib_path):
             self.makezip()
 
+
 class AWSLambdaGetConfigTask(BaseTask):
     """Get function configuration on AWS Lambda."""
     name = 'aws-getconfig'
 
     def __init__(self, function_name='hello-lambda', qualifier='\$LATEST'):
-
         self.options = dict(
             function_name=function_name,
             qualifier=qualifier,
         )
+        super(AWSLambdaGetConfigTask, self).__init__()
 
     def run_main(self, function_name=None):
         self.get_function_config(function_name)
@@ -137,7 +145,6 @@ class AWSLambdaInvokeTask(BaseTask):
     name = 'aws-invoke'
 
     def __init__(self, function_name='hello-lambda', payload='file://event.json', qualifier='\$LATEST'):
-
         self.options = dict(
             function_name=function_name,
             invocation_type='RequestResponse',
@@ -146,6 +153,7 @@ class AWSLambdaInvokeTask(BaseTask):
             qualifier=qualifier,
             outfile=os.path.join(tempfile.gettempdir(), 'outfile.txt')
         )
+        super(AWSLambdaInvokeTask, self).__init__()
 
     def run_main(self, function_name=None):
         self.invoke(function_name)
@@ -186,6 +194,7 @@ class AWSLambdaUpdateCodeTask(BaseTask):
             function_name=function_name,
             zip_file=zip_file
         )
+        super(AWSLambdaUpdateCodeTask, self).__init__()
 
     def run_main(self, function_name=None):
         if function_name is not None:
