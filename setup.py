@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
+
 from setuptools import setup
 
 with open(os.path.join(os.path.dirname(__file__), 'README.md')) as readme:
@@ -16,6 +17,8 @@ setup(
     description='Fabric tasks for AWS Lambda Python',
     long_description=README,
     url='https://github.com/kunihikokido/fabric-aws-lambda',
+    dependency_links=['https://github.com/kunihikokido/fabric-aws-lambda/tarball/master#egg=fabric-aws-lambda-0.1'],
     author='Kunihiko Kido',
     author_email='kunihiko.kido@me.com',
+    install_requires=['awscli', 'fabric']
 )
