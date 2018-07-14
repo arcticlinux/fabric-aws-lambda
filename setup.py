@@ -20,5 +20,8 @@ setup(
     dependency_links=['https://github.com/kunihikokido/fabric-aws-lambda/tarball/master#egg=fabric-aws-lambda-0.1'],
     author='Kunihiko Kido',
     author_email='kunihiko.kido@me.com',
-    install_requires=['awscli', 'fabric']
+    install_requires=[
+        'awscli',
+        'Fabric3'
+    ]
 )
