@@ -207,7 +207,9 @@ class AWSLambdaUpdateCodeTask(BaseTask):
     """Update code on AWS Lambda."""
     name = 'aws-updatecode'
 
-    def __init__(self, function_name='hello-lambda', zip_file='fileb://lambda_function.zip'):
+    def __init__(self, function_name, zip_file='fileb://lambda_function.zip'):
+        if function_name is None:
+            raise Exception('Function Name Required')
         self.options = dict(
             function_name=function_name,
             zip_file=zip_file
