@@ -45,11 +45,11 @@ class SetupTask(BaseTask):
             lib_path=self.lib_path
         )
 
-        command = (
-            "pip install --upgrade",
-            "-r {requirements}",
-            "-t {lib_path}"
-        )
+        command = [
+            'pip install --upgrade',
+            '-r {requirements}',
+            '-t {lib_path}'
+        ]
         local(' '.join(command).format(**options))
 
 
@@ -76,14 +76,14 @@ class InvokeTask(BaseTask):
             self.options['event_file'] = event_file
 
         with shell_env(PYTHONPATH=self.options['lib_path']):
-            command = (
-                "python-lambda-local",
-                "-t {timeout}"
-                "-l {lib_path}",
-                "-f {lambda_handler}",
-                "{lambda_file}",
-                "{event_file}"
-            )
+            command = [
+                'python-lambda-local',
+                '-t {timeout}'
+                '-l {lib_path}',
+                '-f {lambda_handler}',
+                '{lambda_file}',
+                '{event_file}'
+            ]
             local(' '.join(command).format(**self.options))
 
 
@@ -124,11 +124,15 @@ class AWSLambdaGetConfigTask(BaseTask):
     """Get function configuration on AWS Lambda."""
     name = 'aws-getconfig'
 
-    def __init__(self, function_name='hello-lambda', qualifier='\$LATEST'):
+    def __init__(self, function_name, qualifier=None):
+        if function_name is None:
+            raise Exception('Function Name Required')
         self.options = dict(
-            function_name=function_name,
-            qualifier=qualifier,
+            function_name=function_name
         )
+        if qualifier:
+            self.options['qualifier'] = qualifier
+
         super(AWSLambdaGetConfigTask, self).__init__()
 
     def run_main(self, function_name=None):
@@ -138,11 +142,12 @@ class AWSLambdaGetConfigTask(BaseTask):
         if function_name is not None:
             self.options['function_name'] = function_name
 
-        command = (
-            "aws lambda get-function-configuration",
-            "--function-name {function_name}",
-            "--qualifier {qualifier}"
-        )
+        command = [
+            'aws lambda get-function-configuration',
+            '--function-name {function_name}'
+        ]
+        if 'qualifier' in self.options:
+            command.append("--qualifier {qualifier}")
         result = local(' '.join(command).format(**self.options), capture=True)
 
         print(result)
@@ -152,15 +157,18 @@ class AWSLambdaInvokeTask(BaseTask):
     """Invoke function on AWS Lambda."""
     name = 'aws-invoke'
 
-    def __init__(self, function_name='hello-lambda', payload='file://event.json', qualifier='\$LATEST'):
+    def __init__(self, function_name, payload='file://event.json', qualifier=None):
+        if function_name is None:
+            raise Exception('Function Name Required')
         self.options = dict(
             function_name=function_name,
             invocation_type='RequestResponse',
             log_type='Tail',
             payload=payload,
-            qualifier=qualifier,
             outfile=os.path.join(tempfile.gettempdir(), 'outfile.txt')
         )
+        if qualifier:
+            self.options['qualifier'] = qualifier
         super(AWSLambdaInvokeTask, self).__init__()
 
     def run_main(self, function_name=None):
@@ -170,15 +178,16 @@ class AWSLambdaInvokeTask(BaseTask):
         if function_name is not None:
             self.options['function_name'] = function_name
 
-        command = (
-            "aws lambda invoke",
-            "--function-name {function_name}",
-            "--invocation-type {invocation_type}",
-            "--log-type {log_type}",
-            "--payload {payload}",
-            "--qualifier {qualifier}",
-            "{outfile}",
-        )
+        command = [
+            'aws lambda invoke',
+            '--function-name {function_name}',
+            '--invocation-type {invocation_type}',
+            '--log-type {log_type}',
+            '--payload {payload}'
+        ]
+        if 'qualifier' in self.options:
+            command += ['--qualifier {qualifier}']
+        command += ['{outfile}']
         result = local(' '.join(command).format(**self.options), capture=True)
 
         self.print_log_result(result)
@@ -209,11 +218,11 @@ class AWSLambdaUpdateCodeTask(BaseTask):
         if function_name is not None:
             self.options['function_name'] = function_name
 
-        command = (
-            "aws lambda update-function-code",
-            "--function-name {function_name}",
-            "--zip-file {zip_file}",
-        )
+        command = [
+            'aws lambda update-function-code',
+            '--function-name {function_name}',
+            '--zip-file {zip_file}',
+        ]
         result = local(' '.join(command).format(**self.options), capture=True)
 
         print(result)
