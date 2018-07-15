@@ -78,7 +78,7 @@ class InvokeTask(BaseTask):
         with shell_env(PYTHONPATH=self.options['lib_path']):
             command = [
                 'python-lambda-local',
-                '-t {timeout}'
+                '-t {timeout}',
                 '-l {lib_path}',
                 '-f {lambda_handler}',
                 '{lambda_file}',
@@ -221,7 +221,7 @@ class AWSLambdaUpdateCodeTask(BaseTask):
         command = [
             'aws lambda update-function-code',
             '--function-name {function_name}',
-            '--zip-file {zip_file}',
+            '--zip-file {zip_file}'
         ]
         result = local(' '.join(command).format(**self.options), capture=True)
 
