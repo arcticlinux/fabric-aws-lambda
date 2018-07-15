@@ -92,8 +92,8 @@ class MakeZipTask(BaseTask):
     name = 'makezip'
 
     def __init__(self, zip_file='lambda_function.zip', exclude_file='exclude.lst', lib_path='./lib'):
-        self.zip_file = zip_file
-        self.exclude_file = os.path.realpath(exclude_file)
+        self.zip_file = os.path.realpath(zip_file)
+        self.exclude_file = exclude_file
         self.lib_path = lib_path
         super(MakeZipTask, self).__init__()
 
@@ -105,19 +105,31 @@ class MakeZipTask(BaseTask):
     def remove_zip_file(self):
         local('rm -rf {}'.format(self.zip_file))
 
-    def makezip(self):
-        options = dict(zip_file=self.zip_file, exclude_file=self.exclude_file)
-        local('zip -r9 {zip_file} * -x@{exclude_file}'.format(**options))
-
     def makezip_basepath(self):
-        self.makezip()
+        options = dict(
+            zip_file=self.zip_file,
+            lib_path=self.lib_path,
+            exclude_file=self.exclude_file
+        )
+        command = [
+            'zip -r9 {zip_file}',
+            '-x{lib_path}/*',
+            '-x@{exclude_file}',
+            '*'
+        ]
+        local(' '.join(command).format(**options))
 
     def makezip_python_modules(self):
+        options = dict(zip_file=self.zip_file)
         if not os.path.exists(self.lib_path) or not os.listdir(self.lib_path):
             return
 
         with lcd(self.lib_path):
-            self.makezip()
+            command = [
+                'zip -r9 {zip_file}',
+                '*'
+            ]
+            local(' '.join(command).format(**options))
 
 
 class AWSLambdaGetConfigTask(BaseTask):
