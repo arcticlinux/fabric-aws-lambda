@@ -93,7 +93,7 @@ class MakeZipTask(BaseTask):
 
     def __init__(self, zip_file='lambda_function.zip', exclude_file='exclude.lst', lib_path='./lib'):
         self.zip_file = zip_file
-        self.exclude_file = exclude_file
+        self.exclude_file = os.path.realpath(exclude_file)
         self.lib_path = lib_path
         super(MakeZipTask, self).__init__()
 
@@ -107,13 +107,13 @@ class MakeZipTask(BaseTask):
 
     def makezip(self):
         options = dict(zip_file=self.zip_file, exclude_file=self.exclude_file)
-        local('zip -r9 {zip_file} * -x{exclude_file}'.format(**options))
+        local('zip -r9 {zip_file} * -x@{exclude_file}'.format(**options))
 
     def makezip_basepath(self):
         self.makezip()
 
     def makezip_python_modules(self):
-        if not os.path.exists(self.lib_path):
+        if not os.path.exists(self.lib_path) or not os.listdir(self.lib_path):
             return
 
         with lcd(self.lib_path):
