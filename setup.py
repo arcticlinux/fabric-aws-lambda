@@ -10,18 +10,19 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
     name='fabric-aws-lambda',
-    version='0.1',
+    version='0.1.1',
     packages=['fabric_aws_lambda'],
     include_package_data=True,
     license='see LICENSE',
     description='Fabric tasks for AWS Lambda Python',
     long_description=README,
-    url='https://github.com/kunihikokido/fabric-aws-lambda',
-    dependency_links=['https://github.com/kunihikokido/fabric-aws-lambda/tarball/master#egg=fabric-aws-lambda-0.1'],
-    author='Kunihiko Kido',
-    author_email='kunihiko.kido@me.com',
+    url='https://github.com/arcticlinux/fabric-aws-lambda',
+    dependency_links=['https://github.com/arcticlinux/fabric-aws-lambda/tarball/master#egg=fabric-aws-lambda-0.1.1'],
+    author='Michael Best',
+    author_email='mbest@arcticlinux.com',
     install_requires=[
         'awscli',
-        'Fabric3'
+        'Fabric3',
+        'python-lambda-local'
     ]
 )

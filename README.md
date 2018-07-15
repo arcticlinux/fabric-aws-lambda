@@ -2,15 +2,24 @@
 
 ## Requirements
 
-* fabric
+* Fabric3
 * awscli
 * python-lambda-local
 
 ## Install
 
 ```shell
-pip install git+https://github.com/kunihikokido/fabric-aws-lambda.git
+pip install git+https://github.com/arcticlinux/fabric-aws-lambda.git
 ```
+
+## Authors
+
+* [Kunihiko Kido](https://github.com/KunihikoKido) - *Initial repository* - [fabric-aws-lambda](https://github.com/KunihikoKido/fabric-aws-lambda)
+* [Michael Best](https://github.com/arcticlinux) - *Modifications* - [fabric-aws-lambda](https://github.com/arcticlinux/fabric-aws-lambda)
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
 
 ## Task Commands
 * ``setup``: Setup on Local Machine.
@@ -119,8 +128,3 @@ class SetupTask(BaseSetupTask):
         local('gzip -d GeoLite2-City.mmdb.gz')
 
 ```
-
-## Example: Projects
-
-* [aws-lambda-geoip](https://github.com/KunihikoKido/aws-lambda-geoip)
-* [aws-lambda-ja-tokenizer](https://github.com/KunihikoKido/aws-lambda-ja-tokenizer)
